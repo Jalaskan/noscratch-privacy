@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>No Scratch — Full Project Documentation</title>
+<style>
+  :root {
+    --gold: #f5c842;
+    --dark: #1a1a2e;
+    --darker: #0d0d1a;
+    --text: #333;
+    --muted: #666;
+    --border: #e0e0e0;
+    --code-bg: #f4f4f4;
+    --success: #2e7d32;
+    --warning: #e65100;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  /* ── Header ── */
+  header {
+    background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+    color: white;
+    padding: 60px 40px;
+    text-align: center;
+  }
+  header .emoji { font-size: 4rem; display: block; margin-bottom: 16px; }
+  header h1 { font-size: 2.8rem; color: var(--gold); margin-bottom: 8px; }
+  header .subtitle { font-size: 1.1rem; color: rgba(255,255,255,0.7); margin-bottom: 24px; }
+  header .badges { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  header .badge {
+    background: rgba(245,200,66,0.2);
+    color: var(--gold);
+    border: 1px solid var(--gold);
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  /* ── Layout ── */
+  .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+
+  /* ── TOC ── */
+  .toc {
+    background: #f9f9f9;
+    border-left: 4px solid var(--gold);
+    padding: 24px 28px;
+    margin: 40px 0;
+    border-radius: 0 8px 8px 0;
+  }
+  .toc h2 { font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 12px; }
+  .toc ol { padding-left: 20px; }
+  .toc li { margin-bottom: 6px; }
+  .toc a { color: var(--dark); text-decoration: none; font-weight: 500; }
+  .toc a:hover { color: var(--gold); }
+
+  /* ── Sections ── */
+  section { padding: 48px 0; border-bottom: 1px solid var(--border); }
+  section:last-child { border-bottom: none; }
+
+  h2 {
+    font-size: 1.8rem;
+    color: var(--dark);
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--gold);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  h3 { font-size: 1.2rem; color: var(--dark); margin: 24px 0 12px; }
+  h4 { font-size: 1rem; color: var(--muted); margin: 16px 0 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  p { margin-bottom: 14px; }
+  ul, ol { padding-left: 24px; margin-bottom: 14px; }
+  li { margin-bottom: 6px; }
+
+  /* ── Elevator pitch ── */
+  .pitch-box {
+    background: linear-gradient(135deg, var(--darker), var(--dark));
+    color: white;
+    border-radius: 12px;
+    padding: 32px;
+    margin: 24px 0;
+    border-left: 4px solid var(--gold);
+  }
+  .pitch-box p { color: rgba(255,255,255,0.9); font-size: 1.1rem; line-height: 1.8; margin: 0; }
+  .pitch-box strong { color: var(--gold); }
+
+  /* ── Code blocks ── */
+  pre {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    padding: 20px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    margin: 16px 0;
+  }
+  code {
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.875em;
+    color: #c0392b;
+  }
+  pre code { background: none; padding: 0; color: inherit; font-size: inherit; }
+
+  /* ── Cards / Tiles ── */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+    margin: 20px 0;
+  }
+  .card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .card .card-icon { font-size: 1.8rem; margin-bottom: 10px; }
+  .card h4 { margin: 0 0 8px; color: var(--dark); font-size: 0.95rem; text-transform: none; letter-spacing: 0; }
+  .card p { color: var(--muted); font-size: 0.875rem; margin: 0; }
+
+  /* ── Architecture diagram ── */
+  .arch {
+    background: #f9f9f9;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 28px;
+    margin: 20px 0;
+    font-family: monospace;
+    font-size: 0.875rem;
+    line-height: 2;
+  }
+  .arch-row { display: flex; align-items: center; gap: 12px; margin: 4px 0; }
+  .arch-box {
+    background: var(--dark);
+    color: var(--gold);
+    padding: 6px 14px;
+    border-radius: 6px;
+    white-space: nowrap;
+    font-weight: bold;
+  }
+  .arch-arrow { color: var(--muted); font-size: 1.2rem; }
+
+  /* ── File tree ── */
+  .file-tree {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    padding: 20px;
+    border-radius: 8px;
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.8;
+    margin: 16px 0;
+  }
+  .file-tree .dir { color: #89b4fa; }
+  .file-tree .file { color: #a6e3a1; }
+  .file-tree .comment { color: #6c7086; }
+
+  /* ── Timeline ── */
+  .timeline { margin: 20px 0; }
+  .timeline-item {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+    align-items: flex-start;
+  }
+  .timeline-num {
+    background: var(--gold);
+    color: var(--dark);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.875rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .timeline-content h4 { margin: 0 0 4px; color: var(--dark); font-size: 0.95rem; text-transform: none; letter-spacing: 0; }
+  .timeline-content p { margin: 0; color: var(--muted); font-size: 0.875rem; }
+
+  /* ── Table ── */
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.9rem; }
+  th { background: var(--dark); color: var(--gold); padding: 10px 14px; text-align: left; }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  tr:nth-child(even) td { background: #f9f9f9; }
+
+  /* ── Status badges ── */
+  .status { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 600; }
+  .status-done { background: #e8f5e9; color: var(--success); }
+  .status-pending { background: #fff3e0; color: var(--warning); }
+
+  /* ── Callout ── */
+  .callout {
+    border-left: 4px solid var(--gold);
+    background: #fffde7;
+    padding: 16px 20px;
+    border-radius: 0 8px 8px 0;
+    margin: 16px 0;
+  }
+  .callout.info { border-color: #1565c0; background: #e3f2fd; }
+  .callout.warning { border-color: #e65100; background: #fff3e0; }
+  .callout p { margin: 0; font-size: 0.9rem; }
+
+  /* ── Footer ── */
+  footer {
+    background: var(--darker);
+    color: rgba(255,255,255,0.5);
+    text-align: center;
+    padding: 32px;
+    font-size: 0.85rem;
+  }
+  footer strong { color: var(--gold); }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="emoji">🎰</span>
+  <h1>No Scratch</h1>
+  <p class="subtitle">Complete Project Documentation — From Idea to App Store</p>
+  <div class="badges">
+    <span class="badge">iOS App</span>
+    <span class="badge">SwiftUI</span>
+    <span class="badge">Flask Backend</span>
+    <span class="badge">Live on Render</span>
+    <span class="badge">App Store Submitted</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- TOC -->
+  <div class="toc">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#elevator">20-Second Elevator Pitch</a></li>
+      <li><a href="#origin">Origin &amp; Problem Statement</a></li>
+      <li><a href="#what">What the App Does</a></li>
+      <li><a href="#architecture">System Architecture</a></li>
+      <li><a href="#tech-stack">Technology Stack</a></li>
+      <li><a href="#codebase">Codebase Overview</a></li>
+      <li><a href="#backend">Flask Backend (app.py)</a></li>
+      <li><a href="#ios">iOS App (Swift)</a></li>
+      <li><a href="#render">Render — Cloud Hosting</a></li>
+      <li><a href="#email">Email Alert System</a></li>
+      <li><a href="#analytics">Analytics</a></li>
+      <li><a href="#monetisation">Monetisation</a></li>
+      <li><a href="#admob">Google AdMob</a></li>
+      <li><a href="#data">Data Sources</a></li>
+      <li><a href="#github">GitHub Repositories</a></li>
+      <li><a href="#appstore">App Store Submission</a></li>
+      <li><a href="#costs">Costs &amp; Revenue</a></li>
+      <li><a href="#future">Future Plans</a></li>
+    </ol>
+  </div>
+
+  <!-- 1. Elevator Pitch -->
+  <section id="elevator">
+    <h2>🚀 20-Second Elevator Pitch</h2>
+    <div class="pitch-box">
+      <p>
+        <strong>No Scratch</strong> is a free iPhone app for UK National Lottery scratchcard players.
+        It shows every scratchcard currently on sale, with real images, exactly how many top prizes are left,
+        and a visual progress bar so you know at a glance whether a card is still worth buying.
+        <strong>Power users pay once</strong> to unlock daily email alerts — they get notified when new cards
+        launch or when top prizes are about to run out. Free to download, ad-supported,
+        with a one-time in-app purchase to go ad-free and unlock alerts.
+      </p>
+    </div>
+  </section>
+
+  <!-- 2. Origin -->
+  <section id="origin">
+    <h2>💡 Origin &amp; Problem Statement</h2>
+    <p>The project started as a simple Python command-line script that scraped the National Lottery prize page to look up scratchcard information by game ID. The core insight was:</p>
+    <ul>
+      <li>The National Lottery publishes how many top prizes remain for every scratchcard</li>
+      <li>Most players have no idea this information exists</li>
+      <li>Buying a card where the top prize has already been claimed is a waste of money</li>
+      <li>No existing app surfaced this information in a simple, visual way</li>
+    </ul>
+    <p>From that Python script, the project evolved into a full iOS app with cloud backend, analytics, email alerts, and App Store submission — built entirely through an iterative conversation with Claude.</p>
+
+    <div class="callout info">
+      <p><strong>Key insight:</strong> The National Lottery is legally required to publish remaining prize data. This is public information that most players simply don't know how to find.</p>
+    </div>
+  </section>
+
+  <!-- 3. What the App Does -->
+  <section id="what">
+    <h2>📱 What the App Does</h2>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">🎫</div>
+        <h4>Browse All Cards</h4>
+        <p>Shows every current UK National Lottery scratchcard with real images fetched from the official CDN.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🏆</div>
+        <h4>Prize Remaining</h4>
+        <p>Displays exactly how many top prizes are left out of the original total, with a colour-coded progress bar.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔍</div>
+        <h4>Search &amp; Filter</h4>
+        <p>Search by card name or game number. Filter by price — £1, £2, £3, £5, £10.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📊</div>
+        <h4>Detail View</h4>
+        <p>Tap any card for full details — top prize, ticket price, game number, and prizes remaining with animated bar.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔔</div>
+        <h4>Prize Alerts (Pro)</h4>
+        <p>Daily email when new cards launch or top prizes run critically low. One-time purchase.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🚫</div>
+        <h4>Ad-Free (Pro)</h4>
+        <p>Remove banner ads permanently with the same one-time Pro purchase.</p>
+      </div>
+    </div>
+
+    <h3>User Flow</h3>
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-num">1</div>
+        <div class="timeline-content">
+          <h4>First Launch</h4>
+          <p>Gambling disclaimer shown — user must tap "I understand" to proceed. Saved to UserDefaults, never shown again.</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-num">2</div>
+        <div class="timeline-content">
+          <h4>Card Grid</h4>
+          <p>All current scratchcards load from the cloud backend. Images load progressively from the National Lottery CDN. Filter chips and search bar at top.</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-num">3</div>
+        <div class="timeline-content">
+          <h4>Card Detail</h4>
+          <p>Tap a card to see full details. Hero image, prize info, animated progress bar, link to national-lottery.co.uk.</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-num">4</div>
+        <div class="timeline-content">
+          <h4>Upgrade (optional)</h4>
+          <p>Star button in nav bar opens upgrade screen. One-time purchase via Apple StoreKit. Email entry after purchase subscribes user to alerts.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Architecture -->
+  <section id="architecture">
+    <h2>🏗️ System Architecture</h2>
+    <div class="arch">
+      <div style="margin-bottom:16px;color:#666;font-family:sans-serif;font-size:0.85rem;">Data flow through the system:</div>
+
+      <div class="arch-row">
+        <div class="arch-box">National Lottery Website</div>
+        <div class="arch-arrow">──▶</div>
+        <div class="arch-box">Flask (Render)</div>
+        <div class="arch-arrow">──▶</div>
+        <div class="arch-box">iOS App</div>
+        <div class="arch-arrow">──▶</div>
+        <div class="arch-box">User</div>
+      </div>
+
+      <div style="margin:16px 0;color:#666;font-family:sans-serif;font-size:0.85rem;">Image flow (bypasses server entirely):</div>
+
+      <div class="arch-row">
+        <div class="arch-box">National Lottery CDN</div>
+        <div class="arch-arrow">──▶</div>
+        <div class="arch-box">iOS App (AsyncImage)</div>
+        <div class="arch-arrow">──▶</div>
+        <div class="arch-box">User</div>
+      </div>
+
+      <div style="margin:16px 0;color:#666;font-family:sans-serif;font-size:0.85rem;">Analytics flow:</div>
+
+      <div class="arch-row">
+        <div class="arch-box">User taps card</div>
+        <div class="arch-arrow">──▶</div>
+        <div class="arch-box">iOS App</div>
+        <div class="arch-arrow">──▶</div>
+        <div class="arch-box">POST /api/log</div>
+        <div class="arch-arrow">──▶</div>
+        <div class="arch-box">SQLite DB</div>
+      </div>
+
+      <div style="margin:16px 0;color:#666;font-family:sans-serif;font-size:0.85rem;">Email alert flow (runs at 8am UTC daily):</div>
+
+      <div class="arch-row">
+        <div class="arch-box">Scheduler Thread</div>
+        <div class="arch-arrow">──▶</div>
+        <div class="arch-box">Scrape NL Site</div>
+        <div class="arch-arrow">──▶</div>
+        <div class="arch-box">Compare Snapshot</div>
+        <div class="arch-arrow">──▶</div>
+        <div class="arch-box">Resend API</div>
+        <div class="arch-arrow">──▶</div>
+        <div class="arch-box">Subscriber Inbox</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Tech Stack -->
+  <section id="tech-stack">
+    <h2>⚙️ Technology Stack</h2>
+    <table>
+      <tr><th>Layer</th><th>Technology</th><th>Purpose</th></tr>
+      <tr><td>iOS App</td><td>Swift 5, SwiftUI</td><td>Native iPhone UI</td></tr>
+      <tr><td>In-App Purchase</td><td>StoreKit 2</td><td>One-time Pro purchase</td></tr>
+      <tr><td>Ads</td><td>Google AdMob</td><td>Banner ads for free users</td></tr>
+      <tr><td>Location</td><td>CoreLocation</td><td>Approximate city for analytics</td></tr>
+      <tr><td>Backend</td><td>Python 3, Flask</td><td>API server</td></tr>
+      <tr><td>Scraping</td><td>requests, BeautifulSoup4</td><td>National Lottery prize data</td></tr>
+      <tr><td>Database</td><td>SQLite</td><td>Analytics + subscribers</td></tr>
+      <tr><td>Email</td><td>Resend API</td><td>Sending alert emails</td></tr>
+      <tr><td>Hosting</td><td>Render (free tier)</td><td>24/7 cloud server</td></tr>
+      <tr><td>Version Control</td><td>GitHub (private repos)</td><td>Code backup</td></tr>
+      <tr><td>Privacy Policy</td><td>GitHub Pages</td><td>Public hosted webpage</td></tr>
+    </table>
+  </section>
+
+  <!-- 6. Codebase Overview -->
+  <section id="codebase">
+    <h2>📁 Codebase Overview</h2>
+
+    <h3>iOS Project Structure</h3>
+    <div class="file-tree">
+      <span class="dir">NoScratch/</span><br>
+      &nbsp;&nbsp;<span class="file">NoScratchApp.swift</span> &nbsp;&nbsp;&nbsp;<span class="comment">// App entry point, AdMob init</span><br>
+      &nbsp;&nbsp;<span class="file">ContentView.swift</span> &nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// Root view — disclaimer gate</span><br>
+      &nbsp;&nbsp;<span class="file">Card.swift</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// Data model + Codable</span><br>
+      &nbsp;&nbsp;<span class="file">NetworkManager.swift</span> &nbsp;<span class="comment">// API calls + hardcoded image map</span><br>
+      &nbsp;&nbsp;<span class="file">LocationManager.swift</span> <span class="comment">// CoreLocation city resolution</span><br>
+      &nbsp;&nbsp;<span class="file">PurchaseManager.swift</span> <span class="comment">// StoreKit 2 purchase flow</span><br>
+      &nbsp;&nbsp;<span class="file">CardListView.swift</span> &nbsp;&nbsp;&nbsp;<span class="comment">// Main grid screen</span><br>
+      &nbsp;&nbsp;<span class="file">CardTileView.swift</span> &nbsp;&nbsp;&nbsp;<span class="comment">// Individual card in grid</span><br>
+      &nbsp;&nbsp;<span class="file">CardDetailView.swift</span> &nbsp;<span class="comment">// Full card detail screen</span><br>
+      &nbsp;&nbsp;<span class="file">UpgradeView.swift</span> &nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// Pro upgrade / IAP screen</span><br>
+      &nbsp;&nbsp;<span class="file">DisclaimerView.swift</span> &nbsp;<span class="comment">// First-launch gambling disclaimer</span><br>
+      &nbsp;&nbsp;<span class="file">BannerAdView.swift</span> &nbsp;&nbsp;&nbsp;<span class="comment">// Google AdMob banner wrapper</span><br>
+      &nbsp;&nbsp;<span class="file">Color+Hex.swift</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// Hex colour extension</span><br>
+    </div>
+
+    <h3>Backend Structure</h3>
+    <div class="file-tree">
+      <span class="dir">scratchcard-scrutinizer/</span><br>
+      &nbsp;&nbsp;<span class="file">app.py</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// Entire Flask backend</span><br>
+      &nbsp;&nbsp;<span class="file">requirements.txt</span> &nbsp;<span class="comment">// Python dependencies</span><br>
+      &nbsp;&nbsp;<span class="file">Procfile</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// Render startup command</span><br>
+      &nbsp;&nbsp;<span class="file">analytics.db</span> &nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// SQLite database (auto-created)</span><br>
+    </div>
+  </section>
+
+  <!-- 7. Flask Backend -->
+  <section id="backend">
+    <h2>🐍 Flask Backend (app.py)</h2>
+    <p>The entire backend lives in a single <code>app.py</code> file deployed to Render. It handles five responsibilities:</p>
+
+    <h3>1. Prize Data Scraping</h3>
+    <p>Scrapes <code>national-lottery.com/national-lottery-scratchcard-prizes</code> — a public table of all active scratchcards with remaining top prizes. Uses <code>requests</code> and <code>BeautifulSoup4</code> with browser-like headers to avoid bot detection.</p>
+
+    <h3>2. Prize Totals API</h3>
+    <p>Calls the National Lottery's internal CMS API to get <code>allTopPrizes</code> and <code>leftTopPrizes</code> for each card. This data is merged with the scraped prize page data and returned to the iOS app.</p>
+    <pre><code>GET https://api-dfe.national-lottery.co.uk/cms-proxy/scratchcardList
+    ?%40jcr:uuid=1cbcc086-3710-47dd-ba65-7e58365efbfa</code></pre>
+
+    <h3>3. API Endpoints</h3>
+    <table>
+      <tr><th>Endpoint</th><th>Method</th><th>Description</th></tr>
+      <tr><td><code>/api/cards</code></td><td>GET</td><td>Returns all current scratchcards with prize data</td></tr>
+      <tr><td><code>/api/log</code></td><td>POST</td><td>Logs a card view event for analytics</td></tr>
+      <tr><td><code>/api/subscribe</code></td><td>POST</td><td>Adds email to subscriber list after purchase</td></tr>
+      <tr><td><code>/api/unsubscribe</code></td><td>GET</td><td>Removes email from subscriber list</td></tr>
+      <tr><td><code>/api/analytics</code></td><td>GET</td><td>Password-protected analytics dashboard</td></tr>
+      <tr><td><code>/api/test-alert</code></td><td>GET</td><td>Manually trigger the daily alert check</td></tr>
+    </table>
+
+    <h3>4. Database (SQLite)</h3>
+    <p>Two tables auto-created on startup:</p>
+    <pre><code>card_views     -- Analytics: timestamp, card_name, game_no, city, country, device
+subscribers    -- Alerts: email, purchase_date, active flag
+card_snapshots -- Daily snapshot for change detection</code></pre>
+
+    <h3>5. Background Threads</h3>
+    <p>Two background threads start on server launch:</p>
+    <ul>
+      <li><strong>Prize data prefetch</strong> — calls the NL CMS API at startup so first request is fast</li>
+      <li><strong>Alert scheduler</strong> — sleeps until 8am UTC, runs daily alert check, sleeps again</li>
+    </ul>
+
+    <h3>Demo Mode</h3>
+    <p>Run with <code>python3 app.py --demo</code> to use hardcoded sample data — useful for testing without hitting the lottery site.</p>
+  </section>
+
+  <!-- 8. iOS App -->
+  <section id="ios">
+    <h2>📱 iOS App (Swift)</h2>
+
+    <h3>Card.swift — Data Model</h3>
+    <p>Defines the <code>Card</code> struct conforming to <code>Identifiable</code> and <code>Codable</code>. Custom <code>init(from decoder:)</code> uses <code>decodeIfPresent</code> with fallbacks so missing/null fields never crash the app. Key computed properties:</p>
+    <ul>
+      <li><code>remainingCount</code> — parses remaining string to Int</li>
+      <li><code>isAlmostGone</code> — true if 3 or fewer prizes left</li>
+      <li><code>isLow</code> — true if 10 or fewer prizes left</li>
+      <li><code>remainingPercentage</code> — leftPrizes / totalPrizes for progress bar</li>
+    </ul>
+
+    <h3>NetworkManager.swift — API + Images</h3>
+    <p>The <code>NetworkManager</code> class (ObservableObject) handles all network calls. Key feature: <strong>images are hardcoded</strong> — a static dictionary maps game numbers to direct CDN URLs extracted from the National Lottery CMS API. This means images load instantly without any server call.</p>
+    <pre><code>private static let imageMap: [String: String] = {
+    let base = "https://assets.national-lottery.co.uk/.imaging/focalpoint/Landscape-3-2/300x"
+    return [
+        "1495": base + "/dam/jcr:d81a3620.../100tripler.jpg",
+        "1479": base + "/dam/jcr:abdcc056.../100kamfay-2025.jpg",
+        // ... 40 cards total
+    ]
+}()</code></pre>
+
+    <h3>PurchaseManager.swift — StoreKit 2</h3>
+    <p>Handles the one-time in-app purchase using Apple's StoreKit 2 API. Purchase state persisted in <code>UserDefaults</code> so it survives app restarts. Includes restore purchases functionality (required by Apple).</p>
+
+    <h3>LocationManager.swift — CoreLocation</h3>
+    <p>Requests "when in use" location permission. Reverse geocodes the last known location to city + country level only — never stores precise coordinates. Used solely for analytics.</p>
+
+    <h3>CardListView.swift — Main Screen</h3>
+    <p>The main grid screen. Uses <code>LazyVGrid</code> with two columns. Includes price filter chips (horizontal ScrollView), search bar, loading state, error state, and banner ad at the bottom for free users. Each card tap logs to analytics via <code>simultaneousGesture</code>.</p>
+
+    <h3>DisclaimerView.swift — Gambling Disclaimer</h3>
+    <p>Shown once on first launch. Covers: app is information only, 18+ requirement, BeGambleAware link, independence from Allwyn/National Lottery. Acceptance stored in <code>UserDefaults</code>.</p>
+  </section>
+
+  <!-- 9. Render -->
+  <section id="render">
+    <h2>☁️ Render — Cloud Hosting</h2>
+    <p>The Flask backend is deployed on <strong>Render</strong> (render.com), a cloud platform similar to Heroku.</p>
+
+    <h3>Configuration</h3>
+    <table>
+      <tr><th>Setting</th><th>Value</th></tr>
+      <tr><td>Service URL</td><td><code>https://scratchy-6inm.onrender.com</code></td></tr>
+      <tr><td>Plan</td><td>Free tier</td></tr>
+      <tr><td>Region</td><td>Europe (Frankfurt)</td></tr>
+      <tr><td>Runtime</td><td>Python 3</td></tr>
+      <tr><td>Start Command</td><td><code>gunicorn app:app</code></td></tr>
+      <tr><td>Auto-deploy</td><td>Yes — on every git push to main</td></tr>
+    </table>
+
+    <h3>Free Tier Limitation</h3>
+    <div class="callout warning">
+      <p><strong>Cold starts:</strong> On the free tier, if no requests hit the server for 15 minutes it "spins down". The next request takes ~30 seconds to wake up. The iOS app shows "First load may take up to 30 seconds" to manage user expectation. Upgrade to paid tier (£7/month) to keep it always awake.</p>
+    </div>
+
+    <h3>Deployment Process</h3>
+    <p>Any push to the <code>main</code> branch on GitHub automatically triggers a new deployment on Render. Zero-downtime deploys.</p>
+    <pre><code>git add .
+git commit -m "Update"
+git push  # Render auto-deploys within ~2 minutes</code></pre>
+  </section>
+
+  <!-- 10. Email Alerts -->
+  <section id="email">
+    <h2>📧 Email Alert System</h2>
+    <p>The alert system runs entirely on the Flask backend. No third-party service beyond Resend for email delivery.</p>
+
+    <h3>How It Works</h3>
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-num">1</div>
+        <div class="timeline-content">
+          <h4>User Purchases Pro</h4>
+          <p>StoreKit purchase completes. UpgradeView shows email entry field.</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-num">2</div>
+        <div class="timeline-content">
+          <h4>Email Registered</h4>
+          <p>App POSTs email to <code>/api/subscribe</code>. Stored in SQLite. Welcome email sent via Resend.</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-num">3</div>
+        <div class="timeline-content">
+          <h4>Daily at 8am UTC</h4>
+          <p>Background thread wakes up. Scrapes current card data. Compares with yesterday's snapshot stored in <code>card_snapshots</code> table.</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-num">4</div>
+        <div class="timeline-content">
+          <h4>Change Detection</h4>
+          <p>New card (game_no not in yesterday's data) → alert. Top prizes ≤ 3 → alert. Less than 20% of prizes remaining → alert.</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-num">5</div>
+        <div class="timeline-content">
+          <h4>Email Sent</h4>
+          <p>HTML email built with three sections: New Cards, Almost Gone, Running Low. Sent to all active subscribers via Resend API.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3>Resend</h3>
+    <p>Resend (resend.com) is the email delivery service. Free tier allows 3,000 emails/month. The API is a simple POST request:</p>
+    <pre><code>POST https://api.resend.com/emails
+Authorization: Bearer re_xxxxxxxxxxxx
+{
+  "from": "alerts@yourdomain.com",
+  "to": ["subscriber@email.com"],
+  "subject": "🎰 No Scratch — Daily Prize Alert",
+  "html": "..."
+}</code></pre>
+
+    <h3>Unsubscribe</h3>
+    <p>Every alert email contains an unsubscribe link: <code>/api/unsubscribe?email=xxx</code> which sets <code>active = 0</code> in the database. Shows a simple confirmation webpage.</p>
+  </section>
+
+  <!-- 11. Analytics -->
+  <section id="analytics">
+    <h2>📊 Analytics</h2>
+    <p>Basic analytics built in-house — no third-party tracking SDK. Data stays on your own server.</p>
+
+    <h3>What's Tracked</h3>
+    <ul>
+      <li><strong>Card name</strong> — which scratchcard was tapped</li>
+      <li><strong>Game number</strong> — the official NL game ID</li>
+      <li><strong>City &amp; Country</strong> — approximate location from CoreLocation reverse geocoding</li>
+      <li><strong>Device</strong> — iPhone model type</li>
+      <li><strong>Timestamp</strong> — UTC datetime</li>
+    </ul>
+
+    <h3>Viewing Analytics</h3>
+    <p>Password-protected JSON endpoint:</p>
+    <pre><code>https://scratchy-6inm.onrender.com/api/analytics?key=noscrath2024</code></pre>
+    <p>Returns: total views, top cards by view count, top cities, 20 most recent events.</p>
+
+    <h3>Privacy</h3>
+    <p>City-level location only — no precise GPS. No names. No device identifiers beyond "iPhone". Disclosed in privacy policy and App Store privacy label.</p>
+  </section>
+
+  <!-- 12. Monetisation -->
+  <section id="monetisation">
+    <h2>💰 Monetisation</h2>
+
+    <h3>Model: Freemium</h3>
+    <table>
+      <tr><th>Feature</th><th>Free</th><th>Pro (one-time)</th></tr>
+      <tr><td>Browse all cards</td><td>✅</td><td>✅</td></tr>
+      <tr><td>Card images</td><td>✅</td><td>✅</td></tr>
+      <tr><td>Prize data</td><td>✅</td><td>✅</td></tr>
+      <tr><td>Search &amp; filter</td><td>✅</td><td>✅</td></tr>
+      <tr><td>Banner ads</td><td>Shown</td><td>Removed</td></tr>
+      <tr><td>Daily email alerts</td><td>❌</td><td>✅</td></tr>
+      <tr><td>New card notifications</td><td>❌</td><td>✅</td></tr>
+      <tr><td>Low prize warnings</td><td>❌</td><td>✅</td></tr>
+    </table>
+
+    <h3>In-App Purchase</h3>
+    <ul>
+      <li><strong>Type:</strong> Non-Consumable (one-time, not subscription)</li>
+      <li><strong>Product ID:</strong> <code>com.jalaskan.noscratch.prizealerts</code></li>
+      <li><strong>Price:</strong> £2.99 (Tier 3)</li>
+      <li><strong>Apple's cut:</strong> 30% → you receive ~£2.09 per purchase</li>
+      <li><strong>Break-even:</strong> ~38 purchases covers the £79/year Apple Developer fee</li>
+    </ul>
+
+    <h3>Revenue Streams</h3>
+    <ol>
+      <li><strong>AdMob banner ads</strong> — shown to all free users, ~£0.50-2.00 CPM</li>
+      <li><strong>Pro IAP</strong> — £2.99 one-time purchase</li>
+    </ol>
+  </section>
+
+  <!-- 13. AdMob -->
+  <section id="admob">
+    <h2>📢 Google AdMob</h2>
+    <p>Banner ads shown at the bottom of the card list for free users. Hidden permanently after Pro purchase.</p>
+
+    <table>
+      <tr><th>Setting</th><th>Value</th></tr>
+      <tr><td>App ID</td><td><code>ca-app-pub-2568091503912116~6868844069</code></td></tr>
+      <tr><td>Banner Ad Unit ID</td><td><code>ca-app-pub-2568091503912116/3995268718</code></td></tr>
+      <tr><td>Test Ad Unit ID</td><td><code>ca-app-pub-3940256099942544/2934735716</code></td></tr>
+      <tr><td>SDK</td><td>Google Mobile Ads (Swift Package Manager)</td></tr>
+      <tr><td>Format</td><td>Standard Banner (320x50)</td></tr>
+    </table>
+
+    <div class="callout">
+      <p><strong>Important:</strong> Switch from the test ad unit ID to the real one before App Store release. The test ID shows "Test Ad" banners — real users should never see these.</p>
+    </div>
+  </section>
+
+  <!-- 14. Data Sources -->
+  <section id="data">
+    <h2>🗂️ Data Sources</h2>
+
+    <h3>Prize Remaining Data</h3>
+    <p>Scraped daily from the public National Lottery prizes page. This is legally published data that Allwyn is required to maintain.</p>
+    <pre><code>https://www.national-lottery.com/national-lottery-scratchcard-prizes</code></pre>
+
+    <h3>Prize Totals + Card Metadata</h3>
+    <p>Fetched from the National Lottery's internal CMS API (discovered via browser DevTools network inspection). Returns allTopPrizes, leftTopPrizes, card names, and image JCR IDs.</p>
+    <pre><code>https://api-dfe.national-lottery.co.uk/cms-proxy/scratchcardList
+    ?%40jcr:uuid=1cbcc086-3710-47dd-ba65-7e58365efbfa</code></pre>
+
+    <h3>Card Images</h3>
+    <p>Served directly from the National Lottery's Magnolia CMS / Akamai CDN. URLs are hardcoded in <code>NetworkManager.swift</code> using the JCR content IDs extracted from the CMS API. Format:</p>
+    <pre><code>https://assets.national-lottery.co.uk/.imaging/focalpoint/Landscape-3-2/300x/dam/jcr:{UUID}/{filename}.jpg</code></pre>
+
+    <div class="callout warning">
+      <p><strong>Note:</strong> The app is not affiliated with or endorsed by Allwyn or The National Lottery. All data is publicly available. The app's disclaimer makes this clear to users.</p>
+    </div>
+  </section>
+
+  <!-- 15. GitHub -->
+  <section id="github">
+    <h2>🐙 GitHub Repositories</h2>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">📱</div>
+        <h4>no-scratch-ios</h4>
+        <p>Private repo. Contains the entire Xcode project — all Swift files, assets, Info.plist.</p>
+        <br>
+        <code>github.com/jalaskan/no-scratch-ios</code>
+      </div>
+      <div class="card">
+        <div class="card-icon">🐍</div>
+        <h4>scratchcard-scrutinizer</h4>
+        <p>Private repo. Flask backend — app.py, requirements.txt, Procfile. Connected to Render for auto-deploy.</p>
+        <br>
+        <code>github.com/jalaskan/scratchcard-scrutinizer</code>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔒</div>
+        <h4>noscratch-privacy</h4>
+        <p>Public repo. Privacy policy HTML page hosted via GitHub Pages. Required by Apple for App Store submission.</p>
+        <br>
+        <code>jalaskan.github.io/noscratch-privacy</code>
+      </div>
+    </div>
+  </section>
+
+  <!-- 16. App Store -->
+  <section id="appstore">
+    <h2>🍎 App Store Submission</h2>
+
+    <table>
+      <tr><th>Field</th><th>Value</th></tr>
+      <tr><td>App Name</td><td>No Scratch</td></tr>
+      <tr><td>Subtitle</td><td>UK Scratchcard Prize Tracker</td></tr>
+      <tr><td>Bundle ID</td><td><code>com.jalaskan.noscratch</code></td></tr>
+      <tr><td>SKU</td><td>noscratch001</td></tr>
+      <tr><td>Category</td><td>Entertainment / Utilities</td></tr>
+      <tr><td>Age Rating</td><td>17+ (Gambling content)</td></tr>
+      <tr><td>Price</td><td>Free</td></tr>
+      <tr><td>Privacy Policy</td><td>jalaskan.github.io/noscratch-privacy</td></tr>
+      <tr><td>IAP Product ID</td><td>com.jalaskan.noscratch.prizealerts</td></tr>
+      <tr><td>IAP Price</td><td>£2.99 (Tier 3)</td></tr>
+      <tr><td>Status</td><td>Submitted for Review</td></tr>
+    </table>
+
+    <h3>Submission Checklist</h3>
+    <ul>
+      <li><span class="status status-done">✅ Done</span> App listing created in App Store Connect</li>
+      <li><span class="status status-done">✅ Done</span> Description, keywords, subtitle</li>
+      <li><span class="status status-done">✅ Done</span> Privacy policy URL</li>
+      <li><span class="status status-done">✅ Done</span> Age rating (17+)</li>
+      <li><span class="status status-done">✅ Done</span> Screenshots uploaded (5 x 6.9 inch)</li>
+      <li><span class="status status-done">✅ Done</span> App binary uploaded (Build 4)</li>
+      <li><span class="status status-done">✅ Done</span> IAP product created and submitted</li>
+      <li><span class="status status-done">✅ Done</span> Encryption compliance answered</li>
+      <li><span class="status status-done">✅ Done</span> App Privacy section completed</li>
+      <li><span class="status status-done">✅ Done</span> Submitted for Review</li>
+      <li><span class="status status-pending">⏳ Pending</span> Apple review (1-3 days)</li>
+      <li><span class="status status-pending">⏳ Pending</span> Switch to real AdMob ID after approval</li>
+    </ul>
+  </section>
+
+  <!-- 17. Costs -->
+  <section id="costs">
+    <h2>💷 Costs &amp; Revenue</h2>
+
+    <h3>Running Costs</h3>
+    <table>
+      <tr><th>Service</th><th>Cost</th><th>Notes</th></tr>
+      <tr><td>Apple Developer Program</td><td>£79/year</td><td>Required for App Store</td></tr>
+      <tr><td>Render (cloud server)</td><td>£0/month</td><td>Free tier — cold starts after 15 mins idle</td></tr>
+      <tr><td>Resend (email)</td><td>£0/month</td><td>Free up to 3,000 emails/month</td></tr>
+      <tr><td>GitHub</td><td>£0/month</td><td>Free for private repos</td></tr>
+      <tr><td>Google AdMob</td><td>£0</td><td>Revenue share — they pay you</td></tr>
+      <tr><td><strong>Total</strong></td><td><strong>£79/year</strong></td><td>Until scale requires paid Render tier</td></tr>
+    </table>
+
+    <h3>Break-Even Analysis</h3>
+    <p>At £2.99 per Pro purchase with Apple's 30% cut (~£2.09 net):</p>
+    <ul>
+      <li><strong>38 purchases</strong> = covers annual Apple Developer fee</li>
+      <li>Any AdMob revenue is additional on top</li>
+      <li>If Render paid tier needed (£7/month): <strong>71 purchases/year</strong> to break even</li>
+    </ul>
+  </section>
+
+  <!-- 18. Future Plans -->
+  <section id="future">
+    <h2>🔮 Future Plans</h2>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">🌐</div>
+        <h4>Always-On Server</h4>
+        <p>Upgrade Render to paid tier (£7/month) to eliminate cold start delays when user base grows.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📈</div>
+        <h4>Analytics Dashboard</h4>
+        <p>Build a proper web dashboard to visualise card popularity by region over time.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔔</div>
+        <h4>Push Notifications</h4>
+        <p>Replace email alerts with native iOS push notifications using Apple Push Notification Service (APNs).</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">⭐</div>
+        <h4>Card Favourites</h4>
+        <p>Let users star their favourite cards and get alerts specifically for those.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📅</div>
+        <h4>Prize History</h4>
+        <p>Use daily snapshots already being saved to show prize depletion over time as a chart.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔄</div>
+        <h4>Auto Image Updates</h4>
+        <p>Replace hardcoded image map with a server-side fetch from the CMS API so new cards get images automatically.</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <p>Built by <strong>jalaskan</strong> · April 2026 · <strong>No Scratch</strong> — UK Scratchcard Prize Tracker</p>
+  <p style="margin-top:8px">Developed with Claude (Anthropic) · Swift + Flask · Deployed on Render</p>
+</footer>
+
+</body>
+</html>
